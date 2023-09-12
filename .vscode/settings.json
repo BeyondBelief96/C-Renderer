@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.ts": "typescript",
+        "stdbool.h": "c",
+        "display.h": "c",
+        "sdl.h": "c"
+    }
+}
