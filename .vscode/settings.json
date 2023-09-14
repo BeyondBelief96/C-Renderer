@@ -3,6 +3,7 @@
         "*.ts": "typescript",
         "stdbool.h": "c",
         "display.h": "c",
-        "sdl.h": "c"
+        "sdl.h": "c",
+        "stdio.h": "c"
     }
 }

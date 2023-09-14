@@ -96,7 +96,6 @@ void draw_dotted_grid(int grid_spacing)
 	}
 }
 
-//the x, y position is the position of the top left corner of the rectangle
 void draw_rect(int x, int y, int width, int height, uint32_t color)
 {
 	for (int i = 0; i < height; i++)
