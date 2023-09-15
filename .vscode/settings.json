@@ -4,6 +4,8 @@
         "stdbool.h": "c",
         "display.h": "c",
         "sdl.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "array": "c",
+        "vector.h": "c"
     }
 }
