@@ -24,4 +24,7 @@ extern mesh_t mesh;
 //Loads the cube mesh data into our global mesh variable.
 void load_cube_mesh_data(void);
 
+//Reads content of .obj file and loads vertices and faces into our mesh.
+void load_obj_file_data(char* filename);
+
 #endif
