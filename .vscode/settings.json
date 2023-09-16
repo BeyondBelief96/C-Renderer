@@ -6,6 +6,7 @@
         "sdl.h": "c",
         "stdio.h": "c",
         "array": "c",
-        "vector.h": "c"
+        "vector.h": "c",
+        "array.h": "c"
     }
 }
