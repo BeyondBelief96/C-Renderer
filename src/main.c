@@ -94,19 +94,23 @@ void update(void)
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	// mesh.rotation.x += 0.01;
-	// mesh.rotation.y += 0.01;
-	// mesh.rotation.z += 0.01;
+	mesh.rotation.x += 0.01;
+	mesh.rotation.y += 0.01;
+	mesh.rotation.z += 0.01;
 	// mesh.scale.x += 0.002;
 	// mesh.scale.y += 0.002;
 	// mesh.scale.z += 0.002;
-	mesh.translation.x += 0.01;
+	// mesh.translation.x += 0.01;
 	mesh.translation.z = 5;
+	mesh.translation.x = 0.002;
 
 	//Create a scale matrix that will be used to multiply mesh vertices.
 	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
 	mat4_t translation_matrix = mat4_make_translation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
-
+	mat4_t rotation_matrix = mat4_make_rotation(mesh.rotation.x, mesh.rotation.y, mesh.rotation.z);
+	mat4_t rotation_matrix_x = mat4_make_rotation_x(mesh.rotation.x);
+	mat4_t rotation_matrix_y = mat4_make_rotation_y(mesh.rotation.y);
+	mat4_t rotation_matrix_z = mat4_make_rotation_z(mesh.rotation.z);
 	int num_faces = array_length(mesh.faces);
 	//Loop all triangle faces of our mesh.
 	for (int i = 0; i < num_faces; i++)
@@ -123,10 +127,17 @@ void update(void)
 		{
 			//Grab current vertex and transform vertex in world space.
 			vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
-			transformed_vertex = mat4_mult_mat4(scale_matrix,  transformed_vertex);
+			//Scale vertex
+			transformed_vertex = mat4_mult_vec4(scale_matrix,  transformed_vertex);
 
-			//Translate the vertex away from the camera
-			transformed_vertex = mat4_mult_mat4(translation_matrix, transformed_vertex);
+			//Rotate vertex
+			transformed_vertex = mat4_mult_vec4(rotation_matrix_x, transformed_vertex);
+			transformed_vertex = mat4_mult_vec4(rotation_matrix_y, transformed_vertex);
+			transformed_vertex = mat4_mult_vec4(rotation_matrix_z, transformed_vertex);
+
+			//Translate vertex
+			transformed_vertex = mat4_mult_vec4(translation_matrix, transformed_vertex);
+			
 
 			//Save transformed vertex in the array of transformed vertices.
 			transformed_vertices[j] = transformed_vertex;
