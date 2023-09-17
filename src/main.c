@@ -36,7 +36,7 @@ vec2_t project(vec3_t point)
 void setup(void)
 {
 	//Initialize render mode and triangle culling method.
-	cull_method = CULL_NONE;
+	cull_method = CULL_BACKFACE;
 	render_method = RENDER_WIRE_VERTEX;
 
 	//Allocate the required memory in bytes to hold color buffer
