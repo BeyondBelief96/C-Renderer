@@ -46,8 +46,8 @@ void setup(void)
 		window_width, window_height);
 
 	//Loads the cube values in our global mesh.
-	load_cube_mesh_data();
-	//load_obj_file_data("./assets/f22.obj");
+	//load_cube_mesh_data();
+	load_obj_file_data("./assets/f22.obj");
 }
 
 void process_input(void)
@@ -219,14 +219,14 @@ void render(void)
 			draw_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				triangle.color);
+				0xFFFFFFFF);
 		}
 		if (render_method == RENDER_FILL_TRIANGLE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
 			// Draw filled triangles
 			draw_filled_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				triangle.color);
+				0xFF000000);
 		}
 	}
 
