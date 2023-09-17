@@ -41,7 +41,7 @@ void setup(void)
 		window_width, window_height);
 
 	//Loads the cube values in our global mesh.
-	load_obj_file_data("./assets/cube.obj");
+	load_obj_file_data("./assets/f22.obj");
 }
 
 void process_input(void)
@@ -114,8 +114,12 @@ void update(void)
 		//1. Find B-A and C-A
 		vec3_t vec_ab = subtract_vec3(b, a);
 		vec3_t vec_ac = subtract_vec3(c, a);
+		vec3_normalize(&vec_ab);
+		vec3_normalize(&vec_ac);
+
 		//2 Find normal vector to face
 		vec3_t normal = vec3_cross(vec_ab, vec_ac);
+		vec3_normalize(&normal);
 		//Find the camera ray
 		vec3_t camera_ray = subtract_vec3(camera_position, a);
 		//Dot normal and camera_ray and figure out if triangle is facing camera.
@@ -161,11 +165,17 @@ void render(void)
 		draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
 		draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
 
+		// Draw filled triangles
+		draw_filled_triangle(triangle.points[0].x, triangle.points[0].y,
+		triangle.points[1].x, triangle.points[1].y,
+		triangle.points[2].x, triangle.points[2].y,
+		0xFFFFFFFF);
+
 		// Draw unfilled triangles
 		draw_triangle(triangle.points[0].x, triangle.points[0].y,
 		triangle.points[1].x, triangle.points[1].y,
 		triangle.points[2].x, triangle.points[2].y,
-		0xFF00FF00);
+		0xFF000000);
 	}
 
 	//Clear the array of triangles to render every frame loop

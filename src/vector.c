@@ -126,3 +126,19 @@ vec3_t vec3_rotate_x(vec3_t v, float angle)
 
 	return rotated_vector;
 }
+
+void vec2_normalize(vec2_t* v)
+{
+	float length = vec2_length(*v);
+	v->x /= length;
+	v->y /= length;
+}
+
+
+void vec3_normalize(vec3_t* v)
+{
+	float length = vec3_length(*v);
+	v->x /= length;
+	v->y /= length;
+	v->z /= length;
+}

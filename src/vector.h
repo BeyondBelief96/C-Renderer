@@ -21,6 +21,7 @@ vec2_t vec2_divide(vec2_t v, float factor);
 float vec2_dot(vec2_t a, vec2_t b);
 float vec2_cross_area(vec2_t a, vec2_t b);
 vec2_t vec2_rotate_z(vec2_t v, float angle);
+void vec2_normalize(vec2_t* v);
 
 // 3D VECTOR FUNCTIONS
 float vec3_length(vec3_t v);
@@ -30,6 +31,7 @@ vec3_t vec3_scale(vec3_t v, float factor);
 vec3_t vec3_divide(vec3_t v, float factor);
 float vec3_dot(vec3_t a, vec3_t b);
 vec3_t vec3_cross(vec3_t a, vec3_t b);
+void vec3_normalize(vec3_t* v);
 // Rotates the vector about the x-axis.
 vec3_t vec3_rotate_x(vec3_t v, float angle);
 
