@@ -30,13 +30,15 @@ vec4_t mat4_mult_vec4(mat4_t m, vec4_t v) {
     return result;
 }
 
-mat4_t mat4_mult_mat4(mat4_t m, mat4_t n) {
+mat4_t mat4_mult_mat4(mat4_t a, mat4_t b) {
     mat4_t result;
     for(int i = 0; i < 4; i++) {
         for(int j = 0; j < 4; j++) {
-            for(int k = 0; k < 4; k++) {
-                result.m[i][j] = m.m[i][k] * n.m[k][j];
-            }
+            result.m[i][j] = 
+            a.m[i][0] * b.m[0][j]+ 
+            a.m[i][1] * b.m[1][j]+ 
+            a.m[i][2] * b.m[2][j]+ 
+            a.m[i][3] * b.m[3][j];
         }
     }
 
@@ -85,11 +87,10 @@ mat4_t mat4_make_rotation_z(float angle) {
 }
 
 mat4_t mat4_make_rotation(float ax, float ay, float az) {
-    mat4_t result = mat4_identity();
     mat4_t rx = mat4_make_rotation_x(ax);
     mat4_t ry = mat4_make_rotation_y(ay);
     mat4_t rz = mat4_make_rotation_z(az);
-    result = mat4_mult_mat4(rx, ry);
-    result = mat4_mult_mat4(result, rz);
-    return result;
+    mat4_t rxy = mat4_mult_mat4(rx, ry);
+    mat4_t rxyz = mat4_mult_mat4(rxy, rz);
+    return rxyz;
 }
