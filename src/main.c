@@ -6,6 +6,7 @@
 #include "vector.h"
 #include "mesh.h"
 #include "array.h"
+#include "matrix.h"
 
 // Array of triangles that should be rendered frame by frame.
 triangle_t* triangles_to_render = NULL;
@@ -46,8 +47,8 @@ void setup(void)
 		window_width, window_height);
 
 	//Loads the cube values in our global mesh.
-	//load_cube_mesh_data();
-	load_obj_file_data("./assets/f22.obj");
+	load_cube_mesh_data();
+	//load_obj_file_data("./assets/f22.obj");
 }
 
 void process_input(void)
@@ -93,9 +94,18 @@ void update(void)
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
+	// mesh.rotation.x += 0.01;
+	// mesh.rotation.y += 0.01;
+	// mesh.rotation.z += 0.01;
+	// mesh.scale.x += 0.002;
+	// mesh.scale.y += 0.002;
+	// mesh.scale.z += 0.002;
+	mesh.translation.x += 0.01;
+	mesh.translation.z = 5;
+
+	//Create a scale matrix that will be used to multiply mesh vertices.
+	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+	mat4_t translation_matrix = mat4_make_translation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
 
 	int num_faces = array_length(mesh.faces);
 	//Loop all triangle faces of our mesh.
@@ -107,18 +117,16 @@ void update(void)
 		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
 		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
-		vec3_t transformed_vertices[3];
+		vec4_t transformed_vertices[3];
 		//Loop all 3 vertices and apply transformations
 		for (int j = 0; j < 3; j++)
 		{
 			//Grab current vertex and transform vertex in world space.
-			vec3_t transformed_vertex = face_vertices[j];
-			transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
-			transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
-			transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
+			vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
+			transformed_vertex = mat4_mult_mat4(scale_matrix,  transformed_vertex);
 
 			//Translate the vertex away from the camera
-			transformed_vertex.z += -5;
+			transformed_vertex = mat4_mult_mat4(translation_matrix, transformed_vertex);
 
 			//Save transformed vertex in the array of transformed vertices.
 			transformed_vertices[j] = transformed_vertex;
@@ -126,9 +134,9 @@ void update(void)
 
 		if (cull_method == CULL_BACKFACE) {
 			//Back face culling
-			vec3_t a = transformed_vertices[0]/*   A   */;
-			vec3_t b = transformed_vertices[1]/*  | \*/;
-			vec3_t c = transformed_vertices[2]/* C---B*/;
+			vec3_t a = vec3_from_vec4(transformed_vertices[0])/*   A   */;
+			vec3_t b = vec3_from_vec4(transformed_vertices[1])/*  | \*/;
+			vec3_t c = vec3_from_vec4(transformed_vertices[2])/* C---B*/;
 			//1. Find B-A and C-A
 			vec3_t vec_ab = subtract_vec3(b, a);
 			vec3_t vec_ac = subtract_vec3(c, a);
@@ -154,7 +162,7 @@ void update(void)
 		for (int j = 0; j < 3; j++)
 		{
 			//Project transformed vertex into screen space.
-			projected_points[j] = project(transformed_vertices[j]);
+			projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
 
 			//Scale and translate projected point to middle of the screen.
 			projected_points[j].x += window_width / 2;
@@ -219,14 +227,14 @@ void render(void)
 			draw_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				0xFFFFFFFF);
+				triangle.color);
 		}
 		if (render_method == RENDER_FILL_TRIANGLE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
 			// Draw filled triangles
 			draw_filled_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				0xFF000000);
+				triangle.color);
 		}
 	}
 
