@@ -30,7 +30,7 @@ vec2_t project(vec3_t point)
 	};
 
 	return projected_point;
-}
+} 
 
 void setup(void)
 {
@@ -46,7 +46,8 @@ void setup(void)
 		window_width, window_height);
 
 	//Loads the cube values in our global mesh.
-	load_obj_file_data("./assets/cube.obj");
+	load_cube_mesh_data();
+	//load_obj_file_data("./assets/f22.obj");
 }
 
 void process_input(void)
@@ -106,7 +107,6 @@ void update(void)
 		face_vertices[1] = mesh.vertices[mesh_face.b - 1];
 		face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
-
 		vec3_t transformed_vertices[3];
 		//Loop all 3 vertices and apply transformations
 		for (int j = 0; j < 3; j++)
@@ -149,34 +149,60 @@ void update(void)
 			}
 		}
 
-
-		triangle_t projected_triangle;
+		vec2_t projected_points[3];
 		//Loop all transformed vertices and project transformed point into screen space.
 		for (int j = 0; j < 3; j++)
 		{
 			//Project transformed vertex into screen space.
-			vec2_t projected_point = project(transformed_vertices[j]);
+			projected_points[j] = project(transformed_vertices[j]);
 
 			//Scale and translate projected point to middle of the screen.
-			projected_point.x += window_width / 2;
-			projected_point.y += window_height / 2;
-
-			//store projected point into our projected triangle structure.
-			projected_triangle.points[j] = projected_point;
+			projected_points[j].x += window_width / 2;
+			projected_points[j].y += window_height / 2;
 		}
+
+		//Calculate the average depth of each face based on the vertices 
+		//after transformation (Painters Algorithm)
+		float avg_depth = (transformed_vertices[0].z +
+		 transformed_vertices[1].z +
+		  transformed_vertices[2].z) / 3.0;
+		
+		//store projected point into our projected triangle structure.
+		triangle_t projected_triangle = {
+			.points = {
+				{projected_points[0].x, projected_points[0].y},
+				{projected_points[1].x, projected_points[1].y},
+				{projected_points[2].x, projected_points[2].y},
+			},
+			.color = mesh_face.color,
+			.avg_depth = avg_depth
+		};
 
 		//Each iteration store the projected triangle that was created.
 		array_push(triangles_to_render, projected_triangle);
+	}	
+
+	//Sort the triangle to render by their average depth.
+	int num_triangles = array_length(triangles_to_render);
+
+	//Bubble Sort
+	for(int i = 0; i < num_triangles; i++) {
+		for(int j = 0; j < num_triangles; j++) {
+			if(triangles_to_render[i].avg_depth < triangles_to_render[j].avg_depth) {
+				triangle_t temp = triangles_to_render[i];
+				triangles_to_render[i] = triangles_to_render[j];
+				triangles_to_render[j] = temp;
+			}
+		}
 	}
 }
 
 void render(void)
 {
-	draw_dotted_grid(10);
+	draw_grid(10);
 
 	//Loop all projected triangles and render them.
 	int num_triangles = array_length(triangles_to_render);
-
 	for (int i = 0; i < num_triangles; i++)
 	{
 		triangle_t triangle = triangles_to_render[i];
@@ -193,14 +219,14 @@ void render(void)
 			draw_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				0xFF0000FF);
+				triangle.color);
 		}
 		if (render_method == RENDER_FILL_TRIANGLE || render_method == RENDER_FILL_TRIANGLE_WIRE) {
 			// Draw filled triangles
 			draw_filled_triangle(triangle.points[0].x, triangle.points[0].y,
 				triangle.points[1].x, triangle.points[1].y,
 				triangle.points[2].x, triangle.points[2].y,
-				0xFFFFFFFF);
+				triangle.color);
 		}
 	}
 
