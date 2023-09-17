@@ -8,6 +8,9 @@ SDL_Texture* color_buffer_texture = NULL;
 int window_width = 800;
 int window_height = 600;
 
+enum cull_method cull_method;
+enum render_method render_method;
+
 bool initialize_window(void)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
