@@ -25,23 +25,23 @@ vec3_t cube_vertices[N_CUBE_VERTICES] = {
 #define N_CUBE_FACES (6 * 2) //6 cube faces, 2 triangles per face
 face_t cube_faces[N_CUBE_FACES] = {
     //front
-    {.a = 1, .b = 2, .c = 3, .color = 0xFFFF0000},
-    {.a = 1, .b = 3, .c = 4, .color = 0xFFFF0000},
+    {.a = 1, .b = 2, .c = 3, .color = 0xFFFFFFFF},
+    {.a = 1, .b = 3, .c = 4, .color = 0xFFFFFFFF},
     //right
-    {.a = 4, .b = 3, .c = 5, .color = 0xFF00FF00},
-    {.a = 4, .b = 5, .c = 6, .color = 0xFF00FF00},
+    {.a = 4, .b = 3, .c = 5, .color = 0xFFFFFFFF},
+    {.a = 4, .b = 5, .c = 6, .color = 0xFFFFFFFF},
     //back
-    {.a = 6, .b = 5, .c = 7, .color = 0xFF0000FF},
-    {.a = 6, .b = 7, .c = 8, .color = 0xFF0000FF},
+    {.a = 6, .b = 5, .c = 7, .color = 0xFFFFFFFF},
+    {.a = 6, .b = 7, .c = 8, .color = 0xFFFFFFFF},
     //left
-    {.a = 8, .b = 7, .c = 2, .color = 0xFFFFFF00},
-    {.a = 8, .b = 2, .c = 1, .color = 0xFFFFFF00},
+    {.a = 8, .b = 7, .c = 2, .color = 0xFFFFFFFF},
+    {.a = 8, .b = 2, .c = 1, .color = 0xFFFFFFFF},
     //top
-    {.a = 2, .b = 7, .c = 5, .color = 0xFFFF00FF},
-    {.a = 2, .b = 5, .c = 3, .color = 0xFFFF00FF},
+    {.a = 2, .b = 7, .c = 5, .color = 0xFFFFFFFF},
+    {.a = 2, .b = 5, .c = 3, .color = 0xFFFFFFFF},
     //bottom
-    {.a = 6, .b = 8, .c = 1, .color = 0xFFFF00FF},
-    {.a = 6, .b = 1, .c = 4, .color = 0xFFFF00FF},
+    {.a = 6, .b = 8, .c = 1, .color = 0xFFFFFFFF},
+    {.a = 6, .b = 1, .c = 4, .color = 0xFFFFFFFF},
 };
 
 void load_cube_mesh_data(void)
@@ -93,6 +93,7 @@ void load_obj_file_data(char* filename)
             face.a = vertex_indices[0];
             face.b = vertex_indices[1];
             face.c = vertex_indices[2];
+            face.color = 0xFFFFFFFF;
             array_push(mesh.faces, face);
         }
     }

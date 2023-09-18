@@ -1,5 +1,4 @@
 
-#define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdbool.h>
@@ -10,6 +9,7 @@
 #include "mesh.h"
 #include "array.h"
 #include "matrix.h"
+#include "light.h"
 
 float M_PI = 3.14159265358979323846;
 
@@ -38,7 +38,7 @@ void setup(void)
 {
 	//Initialize render mode and triangle culling method.
 	cull_method = CULL_BACKFACE;
-	render_method = RENDER_WIRE_VERTEX;
+	render_method = RENDER_FILL_TRIANGLE;
 
 	//Allocate the required memory in bytes to hold color buffer
 	color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
@@ -55,8 +55,8 @@ void setup(void)
 	proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
 	//Loads the cube values in our global mesh.
-	load_cube_mesh_data();
-	//load_obj_file_data("./assets/f22.obj");
+	//load_cube_mesh_data();
+	load_obj_file_data("./assets/f22.obj");
 }
 
 void process_input(void)
@@ -102,13 +102,22 @@ void update(void)
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	mesh.rotation.x += 0.01;
+	// mesh.rotation.x += 0.01;
 	// mesh.rotation.y += 0.01;
 	// mesh.rotation.z += 0.01;
-	//mesh.scale.x += 0.002;
-	// mesh.scale.y += 0.002;
-	// mesh.scale.z += 0.002;
-	// mesh.translation.x += 0.01;
+	// mesh.translation.z = 5;
+
+	//FOR F22 OBJ FILE
+	float t = SDL_GetTicks() * 0.0005;
+	mesh.rotation.x += 0.02;
+
+	mesh.scale.x = sin(t) + 1;
+	mesh.scale.y = sin(t) + 1;
+	mesh.scale.z = sin(t) + 1;
+
+	mesh.translation.x = tan(t) * 2;
+	mesh.translation.y = sin(t) * 2.2;
+
 	mesh.translation.z = 5;
 
 	//Create a scale matrix that will be used to multiply mesh vertices.
@@ -143,7 +152,7 @@ void update(void)
 			transformed_vertices[j] = transformed_vertex;
 		}
 
-		if (cull_method == CULL_BACKFACE) {
+
 			//Back face culling
 			vec3_t a = vec3_from_vec4(transformed_vertices[0])/*   A   */;
 			vec3_t b = vec3_from_vec4(transformed_vertices[1])/*  | \*/;
@@ -161,10 +170,10 @@ void update(void)
 			vec3_t camera_ray = subtract_vec3(camera_position, a);
 			//Dot normal and camera_ray and figure out if triangle is facing camera.
 			float dot_camera_normal = vec3_dot(camera_ray, normal);
-
-			//Bypass the triangles that are looking away from the camera.
-			if (dot_camera_normal < 0) {
-				continue;
+			if (cull_method == CULL_BACKFACE) {
+				//Bypass the triangles that are looking away from the camera.
+				if (dot_camera_normal < 0) {
+					continue;
 			}
 		}
 
@@ -187,9 +196,17 @@ void update(void)
 		//Calculate the average depth of each face based on the vertices 
 		//after transformation (Painters Algorithm)
 		float avg_depth = (transformed_vertices[0].z +
-		 transformed_vertices[1].z +
-		  transformed_vertices[2].z) / 3.0;
+		transformed_vertices[1].z +
+		transformed_vertices[2].z) / 3.0;
 		
+		//Calculate the shade intensity based on how aligned the face normal
+		//is with the light direction. We flip the sign of the dot product because
+		//the dot product needs to be with the vector from the face to the light.
+		float light_intensity_factor = -vec3_dot(normal, light.direction);
+
+		//Calculate the triangle color based on the light angle.
+		uint32_t triangle_color = light_apply_intensity(mesh_face.color, light_intensity_factor);
+
 		//store projected point into our projected triangle structure.
 		triangle_t projected_triangle = {
 			.points = {
@@ -197,7 +214,7 @@ void update(void)
 				{projected_points[1].x, projected_points[1].y},
 				{projected_points[2].x, projected_points[2].y},
 			},
-			.color = mesh_face.color,
+			.color = triangle_color,
 			.avg_depth = avg_depth
 		};
 
@@ -222,7 +239,7 @@ void update(void)
 
 void render(void)
 {
-	draw_grid(10);
+	draw_dotted_grid(10);
 
 	//Loop all projected triangles and render them.
 	int num_triangles = array_length(triangles_to_render);
@@ -231,9 +248,9 @@ void render(void)
 		triangle_t triangle = triangles_to_render[i];
 		if (render_method == RENDER_WIRE_VERTEX) {
 			//Draw vertex points
-			draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFF0000);
-			draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFF0000);
-			draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFF0000);
+			draw_rect(triangle.points[0].x, triangle.points[0].y, 3, 3, 0xFFFFFF00);
+			draw_rect(triangle.points[1].x, triangle.points[1].y, 3, 3, 0xFFFFFF00);
+			draw_rect(triangle.points[2].x, triangle.points[2].y, 3, 3, 0xFFFFFF00);
 		}
 		if (render_method == RENDER_WIRE ||
 		 	render_method == RENDER_FILL_TRIANGLE_WIRE ||
