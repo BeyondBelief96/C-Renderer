@@ -1,25 +1,26 @@
+
+#define _USE_MATH_DEFINES
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <math.h>
 #include "display.h"
 #include "vector.h"
 #include "mesh.h"
 #include "array.h"
 #include "matrix.h"
 
+float M_PI = 3.14159265358979323846;
+
 // Array of triangles that should be rendered frame by frame.
 triangle_t* triangles_to_render = NULL;
-
 // Global Variables for execution status and game.
 vec3_t camera_position = { 0, 0, 0 };
-
-float fov_factor = 640;
-
+mat4_t proj_matrix;
+float fov_factor = 640;  
 bool is_running = false;
-
 int previous_frame_time = 0;
-
 
 //Function that recieves a 3D vector and returns a projected 2D point.
 //This uses a perspective perspection by dividing by the original points depth.
@@ -45,6 +46,13 @@ void setup(void)
 	//Create SDL color buffer texture to display color buffer.
 	color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
 		window_width, window_height);
+
+	//Iniitialize the perspective projection matrix
+	float fov = 60.0 * (M_PI / 180);
+	float aspect = (float) window_height / window_width;
+	float znear = 0.1;
+	float zfar = 100.0;
+	proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
 	//Loads the cube values in our global mesh.
 	load_cube_mesh_data();
@@ -95,14 +103,13 @@ void update(void)
 	triangles_to_render = NULL;
 
 	mesh.rotation.x += 0.01;
-	mesh.rotation.y += 0.01;
-	mesh.rotation.z += 0.01;
-	mesh.scale.x += 0.002;
-	mesh.scale.y += 0.002;
-	mesh.scale.z += 0.002;
-	mesh.translation.x += 0.01;
+	// mesh.rotation.y += 0.01;
+	// mesh.rotation.z += 0.01;
+	//mesh.scale.x += 0.002;
+	// mesh.scale.y += 0.002;
+	// mesh.scale.z += 0.002;
+	// mesh.translation.x += 0.01;
 	mesh.translation.z = 5;
-	// mesh.translation.x = 0.002;
 
 	//Create a scale matrix that will be used to multiply mesh vertices.
 	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
@@ -161,16 +168,20 @@ void update(void)
 			}
 		}
 
-		vec2_t projected_points[3];
+		vec4_t projected_points[3];
 		//Loop all transformed vertices and project transformed point into screen space.
 		for (int j = 0; j < 3; j++)
 		{
 			//Project transformed vertex into screen space.
-			projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
+			projected_points[j] = mat4_mult_vec4_project(proj_matrix, transformed_vertices[j]);
 
-			//Scale and translate projected point to middle of the screen.
-			projected_points[j].x += window_width / 2;
-			projected_points[j].y += window_height / 2;
+			//Scale into the view port
+			projected_points[j].x *= (window_width / 2.0);
+			projected_points[j].y *= (window_height / 2.0);
+
+			//Translate projected point to middle of the screen.
+			projected_points[j].x += window_width / 2.0;
+			projected_points[j].y += window_height / 2.0;
 		}
 
 		//Calculate the average depth of each face based on the vertices 
