@@ -16,6 +16,8 @@ extern enum cull_method {
 extern enum render_method {
     RENDER_WIRE,
     RENDER_WIRE_VERTEX,
+    RENDER_TEXTURED,
+    RENDER_TEXTURED_WIRE,
     RENDER_FILL_TRIANGLE,
     RENDER_FILL_TRIANGLE_WIRE
 } render_method;
