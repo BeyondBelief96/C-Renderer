@@ -1,21 +1,16 @@
 #include "triangle.h"
 #include "display.h"
-
-void int_swap(int* a, int* b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
+#include "swap.h"
 
 void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
     //Find the two inverse slopes of the two triangle legs.
-    float inv_slope_1 = (float)(x1 - x0)/(y1 - y0);
-    float inv_slope_2 = (float)(x2 - x0)/(y2 - y0);
+    float inv_slope_1 = (float)(x1 - x0) / (y1 - y0);
+    float inv_slope_2 = (float)(x2 - x0) / (y2 - y0);
 
     //Start x_start and x_end fromt he top vertex (x0, y0)
     float x_start = x0;
     float x_end = x0;
-    for(int y = y0; y <= y2; y++) {
+    for (int y = y0; y <= y2; y++) {
         //Find x start and x end for each scanline
         draw_line_dda(x_start, y, x_end, y, color);
         x_start += inv_slope_1;
@@ -25,12 +20,12 @@ void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
 
 void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color) {
     //Find the two inverse slopes of the two triangle legs.
-    float inv_slope_1 = (float)(x2 - x0)/(y2 - y0);
-    float inv_slope_2 = (float)(x2 - x1)/(y2 - y1);
+    float inv_slope_1 = (float)(x2 - x0) / (y2 - y0);
+    float inv_slope_2 = (float)(x2 - x1) / (y2 - y1);
     //Start x_start and x_end fromt the bottom vertex (x2, y2)
     float x_start = x2;
     float x_end = x2;
-    for(int y = y2; y >= y0; y--) {
+    for (int y = y2; y >= y0; y--) {
         //Find x start and x end for each scanline
         draw_line_dda(x_start, y, x_end, y, color);
         x_start -= inv_slope_1;
@@ -41,26 +36,29 @@ void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint
 void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color)
 {
     //Sort the vertices by y-coordinate ascending (y0 < y1 < y2)
-    if(y0 > y1) {
+    if (y0 > y1) {
         int_swap(&y0, &y1);
         int_swap(&x0, &x1);
     }
-    if(y1 > y2) {
+    if (y1 > y2) {
         int_swap(&y1, &y2);
         int_swap(&x1, &x2);
     }
-    if(y0 > y1) {
+    if (y0 > y1) {
         int_swap(&y0, &y1);
         int_swap(&x0, &x1);
     }
-    
-    if(y1 == y2) {
+
+    if (y1 == y2) {
         fill_flat_bottom_triangle(x0, y0, x1, y1, x2, y2, color);
-    } else if (y0 == y1) {
+    }
+    else if (y0 == y1) {
         fill_flat_top_triangle(x0, y0, x1, y1, x2, y2, color);
-    } else if(y0 == y2) {
+    }
+    else if (y0 == y2) {
         return;
-    } else {
+    }
+    else {
         //Calculate midpoint vertex (Mx, My) using triangle similarity
         int My = y1;
         int Mx = ((float)((x2 - x0) * (y1 - y0)) / (float)(y2 - y0)) + x0;
@@ -75,8 +73,76 @@ void draw_textured_triangle(
     int x0, int y0, float u0, float v0,
     int x1, int y1, float u1, float v1,
     int x2, int y2, float u2, float v2,
-    uint32_t* texture) 
+    uint32_t* texture)
 {
     //Loop all the pixels of the triangle to render them based on the color
     //that comes from the texture.
+    //Sort the vertices by y-value ascending (with 0 at top)
+    if (y0 > y1) {
+        int_swap(&y0, &y1);
+        int_swap(&x0, &x1);
+        float_swap(&u0, &u1);
+        float_swap(&v0, &v1);
+    }
+    if (y1 > y2) {
+        int_swap(&y1, &y2);
+        int_swap(&x1, &x2);
+        float_swap(&u1, &u2);
+        float_swap(&v1, &v2);
+    }
+    if (y0 > y1) {
+        int_swap(&y0, &y1);
+        int_swap(&x0, &x1);
+        float_swap(&u0, &u1);
+        float_swap(&v0, &v1);
+    }
+
+    //Render the upper part of the triangle (flat bottom)
+    /////////////////////////////////////////////////////
+    //Find the two inverse slopes of the two triangle legs.
+
+    float inv_slope_1 = 0;
+    float inv_slope_2 = 0;
+
+    if (y1 - y0 != 0) inv_slope_1 = (float)(x1 - x0) / (abs(y1 - y0));
+    if (y2 - y0 != 0) inv_slope_2 = (float)(x2 - x0) / (abs(y2 - y0));
+    if (y1 - y0 != 0) {
+        for (int y = y0; y < y1; y++) {
+            int x_start = x1 + (y - y1) * inv_slope_1;
+            int x_end = x0 + (y - y0) * inv_slope_2;
+
+            if (x_end < x_start) {
+                int_swap(&x_start, &x_end);
+            }
+
+            for (int x = x_start; x < x_end; x++) {
+                //Draw our pixel with color from the texture.
+                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+            }
+        }
+    }
+
+    //Render the lower part of the triangle (flat top)
+    /////////////////////////////////////////////////////
+    //Find the two inverse slopes of the two triangle legs.
+    inv_slope_1 = 0;
+    inv_slope_2 = 0;
+
+    if (y2 - y1 != 0) inv_slope_1 = (float)(x2 - x1) / (abs(y2 - y1));
+    if (y2 - y0 != 0) inv_slope_2 = (float)(x2 - x0) / (abs(y2 - y0));
+    if (y2 - y1 != 0) {
+        for (int y = y1; y < y2; y++) {
+            int x_start = x1 + (y - y1) * inv_slope_1;
+            int x_end = x0 + (y - y0) * inv_slope_2;
+
+            if (x_end < x_start) {
+                int_swap(&x_start, &x_end);
+            }
+
+            for (int x = x_start; x < x_end; x++) {
+                //Draw our pixel with color from the texture.
+                draw_pixel(x, y, (x % 2 == 0 && y % 2 == 0) ? 0xFFFF00FF : 0xFF000000);
+            }
+        }
+    }
 }

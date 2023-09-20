@@ -9,6 +9,8 @@
         "vector.h": "c",
         "array.h": "c",
         "functional": "c",
-        "random": "c"
+        "random": "c",
+        "light.h": "c",
+        "swap.h": "c"
     }
 }

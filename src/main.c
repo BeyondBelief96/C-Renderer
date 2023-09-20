@@ -113,23 +113,23 @@ void update(void)
 	//Initialize the array of triangles to render
 	triangles_to_render = NULL;
 
-	// mesh.rotation.x += 0.01;
-	// mesh.rotation.y += 0.01;
-	// mesh.rotation.z += 0.01;
-	// mesh.translation.z = 5;
+	mesh.rotation.x += -0.01;
+	mesh.rotation.y += 0.00;
+	mesh.rotation.z += 0.00;
+	mesh.translation.z = 5;
 
 	//FOR F22 OBJ FILE
-	float t = SDL_GetTicks() * 0.0005;
-	mesh.rotation.x += 0.02;
+	// float t = SDL_GetTicks() * 0.0005;
+	// mesh.rotation.x += 0.02;
 
-	mesh.scale.x = sin(t) + 1;
-	mesh.scale.y = sin(t) + 1;
-	mesh.scale.z = sin(t) + 1;
+	// mesh.scale.x = sin(t) + 1;
+	// mesh.scale.y = sin(t) + 1;
+	// mesh.scale.z = sin(t) + 1;
 
-	mesh.translation.x = tan(t) * 2;
-	mesh.translation.y = sin(t) * 2.2;
+	// mesh.translation.x = tan(t) * 2;
+	// mesh.translation.y = sin(t) * 2.2;
 
-	mesh.translation.z = 5;
+	// mesh.translation.z = 5;
 
 	//Create a scale matrix that will be used to multiply mesh vertices.
 	mat4_t scale_matrix = mat4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
