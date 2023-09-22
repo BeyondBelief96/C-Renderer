@@ -1,13 +1,13 @@
 #include "swap.h"
 
 void int_swap(int* a, int* b) {
-    int temp = *a;
+    int tmp = *a;
     *a = *b;
-    *b = temp;
+    *b = tmp;
 }
 
 void float_swap(float* a, float* b) {
-    float temp = *a;
+    float tmp = *a;
     *a = *b;
-    *b = temp;
+    *b = tmp;
 }
