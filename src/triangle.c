@@ -190,18 +190,14 @@ void draw_texel(
     // Variables to store the interpolated values of U, V, and also 1/w for the current pixel
     float interpolated_u;
     float interpolated_v;
-    float interpolated_reciprocal_w;
 
     // Perform the interpolation of all U/w and V/w values using barycentric weights and a factor of 1/w
-    interpolated_u = (a_uv.u / point_a.w) * alpha + (b_uv.u / point_b.w) * beta + (c_uv.u / point_c.w) * gamma;
-    interpolated_v = (a_uv.v / point_a.w) * alpha + (b_uv.v / point_b.w) * beta + (c_uv.v / point_c.w) * gamma;
-
-    // Also interpolate the value of 1/w for the current pixel
-    interpolated_reciprocal_w = (1 / point_a.w) * alpha + (1 / point_b.w) * beta + (1 / point_c.w) * gamma;
-
-    // Now we can divide back both interpolated values by 1/w
-    interpolated_u /= interpolated_reciprocal_w;
-    interpolated_v /= interpolated_reciprocal_w;
+    float A = alpha*point_b.w*point_c.w;
+    float B = beta*point_a.w*point_c.w;
+    float C = gamma*point_a.w*point_b.w;
+    float sum = 1 / (A + B + C);
+    interpolated_u = (a_uv.u*A + b_uv.u * B + c_uv.u*C) * sum;
+    interpolated_v = (a_uv.v*A + b_uv.v * B + c_uv.v*C) * sum;
 
     // Map the UV coordinate to the full texture width and height
     int tex_x = abs((int)(interpolated_u * texture_width));
