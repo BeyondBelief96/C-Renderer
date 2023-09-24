@@ -22,7 +22,6 @@ extern enum render_method {
     RENDER_FILL_TRIANGLE_WIRE
 } render_method;
 
-
 extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern uint32_t* color_buffer;

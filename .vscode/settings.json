@@ -11,6 +11,7 @@
         "functional": "c",
         "random": "c",
         "light.h": "c",
-        "swap.h": "c"
+        "swap.h": "c",
+        "triangle.h": "c"
     }
 }

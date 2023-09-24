@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include "upng.h"
 #include "array.h"
 #include "display.h"
 #include "vector.h"
@@ -22,7 +23,7 @@ float M_PI = 3.1415926535897932384626433832795028841971;
 bool is_running = false;
 int previous_frame_time = 0;
 
-vec3_t camera_position = { .x = 0, .y = 0, .z = 0 };
+vec3_t camera_position = { 0, 0, 0 };
 mat4_t proj_matrix;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,7 +31,7 @@ mat4_t proj_matrix;
 ///////////////////////////////////////////////////////////////////////////////
 void setup(void) {
     // Initialize render mode and triangle culling method
-    render_method = RENDER_TEXTURED_WIRE;
+    render_method = RENDER_TEXTURED;
     cull_method = CULL_BACKFACE;
 
     // Allocate the required memory in bytes to hold the color buffer
@@ -39,7 +40,7 @@ void setup(void) {
     // Creating a SDL texture that is used to display the color buffer
     color_buffer_texture = SDL_CreateTexture(
         renderer,
-        SDL_PIXELFORMAT_ARGB8888,
+        SDL_PIXELFORMAT_RGBA32,
         SDL_TEXTUREACCESS_STREAMING,
         window_width,
         window_height
@@ -52,14 +53,12 @@ void setup(void) {
     float zfar = 100.0;
     proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
 
-    // Manually load the hardcoded texture data from the static array
-    mesh_texture = (uint32_t*)REDBRICK_TEXTURE;
-    texture_width = 64;
-    texture_height = 64;
-
     // Loads the vertex and face values for the mesh data structure
-    load_cube_mesh_data();
-    // load_obj_file_data("./assets/f22.obj");
+    // load_cube_mesh_data();
+    load_obj_file_data("./assets/f22.obj");
+
+    // Load the texture information from an external PNG file
+    load_png_texture_data("./assets/f22.png");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,8 +112,8 @@ void update(void) {
     triangles_to_render = NULL;
 
     // Change the mesh scale, rotation, and translation values per animation frame
-    mesh.rotation.x += 0.000;
-    mesh.rotation.y += 0.05;
+    mesh.rotation.x += -0.05;
+    mesh.rotation.y += 0.000;
     mesh.rotation.z += 0.000;
     mesh.translation.z = 5.0;
 
@@ -293,9 +292,9 @@ void render(void) {
 
         // Draw triangle vertex points
         if (render_method == RENDER_WIRE_VERTEX) {
-            draw_rect(triangle.points[0].x - 3, triangle.points[0].y - 3, 6, 6, 0xFFFF0000); // vertex A
-            draw_rect(triangle.points[1].x - 3, triangle.points[1].y - 3, 6, 6, 0xFFFF0000); // vertex B
-            draw_rect(triangle.points[2].x - 3, triangle.points[2].y - 3, 6, 6, 0xFFFF0000); // vertex C
+            draw_rect(triangle.points[0].x - 3, triangle.points[0].y - 3, 6, 6, 0xFF0000FF); // vertex A
+            draw_rect(triangle.points[1].x - 3, triangle.points[1].y - 3, 6, 6, 0xFF0000FF); // vertex B
+            draw_rect(triangle.points[2].x - 3, triangle.points[2].y - 3, 6, 6, 0xFF0000FF); // vertex C
         }
     }
 
@@ -314,6 +313,7 @@ void render(void) {
 ///////////////////////////////////////////////////////////////////////////////
 void free_resources(void) {
     free(color_buffer);
+    upng_free(png_texture);
     array_free(mesh.faces);
     array_free(mesh.vertices);
 }
