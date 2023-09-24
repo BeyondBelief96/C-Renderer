@@ -1,11 +1,13 @@
 # C-Renderer
-A C based 3-Dimensional graphical renderer utilizing SDL2.0. Renderer was made during 3D Graphics Course by Pikuma. 
-This repository was an academic excercise in learning the fundamentals of 3-D graphics. The renderer currently supports
-  - Basic 2-D and 3-D vector operations such as: addition, subtraction, dot & cross product, rotations, normalization.
-  - Uses SDL2.0 to initialize a window and renderer.
-  - Basic game loop implemented with a setup(), process_input(), update(), and render() functions.
-  - Ability to draw points, rectangles, lines, and triangles.
-  - Uses ideas of vertices and faces to describe a mesh.
-  - Ability to read .obj files to load vertices and faces into meshes.
-  - Backface culling is implemented to only render faces that face the camera.
-![5](https://github.com/BeyondBelief96/C-Renderer/assets/50305220/8d474b46-c392-4e1b-9a0f-e98b04709608)
+A 3D Graphics renderer written in C alongside Pikumas "Fundamentals of 3D Graphics" course. This repository is an academic exercise in learning how 3D graphics work and not meant to be representative of production level code. This repository specifically is configured to compile on linux/ubuntu based systems. 
+
+Currently the 3D renderer supports:
+- Full triangle rasterization using naive rounding approach.
+- .obj file loading to load meshes.
+- perspective correct texturing
+- loading .png files for textures
+- backface culling
+- z buffer
+- Flat shading lighting model
+<img width="1501" alt="Screenshot 2023-09-24 at 12 23 28 AM" src="https://github.com/BeyondBelief96/C-Renderer-MacOS/assets/50305220/2f2a9a27-b1f7-4858-acd4-3ca8330cdb6e">
+
