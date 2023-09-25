@@ -12,6 +12,7 @@
 #include "texture.h"
 #include "mesh.h"
 #include "camera.h"
+#include "clipping.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Global variables for execution status and game loop
@@ -40,7 +41,7 @@ mat4_t view_matrix;
 ///////////////////////////////////////////////////////////////////////////////
 void setup(void) {
     // Initialize render mode and triangle culling method
-    render_method = RENDER_TEXTURED;
+    render_method = RENDER_WIRE;
     cull_method = CULL_BACKFACE;
 
     // Allocate the required memory in bytes to hold the color buffer and the z-buffer
@@ -57,17 +58,20 @@ void setup(void) {
     );
 
     // Initialize the perspective projection matrix
-    float fov = 3.141592 / 3.0; // the same as 180/3, or 60deg
+    float fov = 60 * (M_PI / 180); // the same as 180/3, or 60deg
     float aspect = (float)window_height / (float)window_width;
-    float znear = 0.1;
-    float zfar = 100.0;
-    proj_matrix = mat4_make_perspective(fov, aspect, znear, zfar);
+    float z_near = 0.1;
+    float z_far = 100.0;
+    proj_matrix = mat4_make_perspective(fov, aspect, z_near, z_far);
+
+    // Initialize frustum planes
+    init_frustum_planes(fov, z_near, z_far);
 
     // Loads the vertex and face values for the mesh data structure
-    load_obj_file_data("./assets/f22.obj");
+    load_obj_file_data("./assets/cube.obj");
 
     // Load the texture information from an external PNG file
-    load_png_texture_data("./assets/f22.png");
+    load_png_texture_data("./assets/cube.png");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,6 +171,8 @@ void update(void) {
     // Loop all triangle faces of our mesh
     int num_faces = array_length(mesh.faces);
     for (int i = 0; i < num_faces; i++) {
+        if(i != 4) continue;
+
         face_t mesh_face = mesh.faces[i];
 
         vec3_t face_vertices[3];
@@ -230,6 +236,22 @@ void update(void) {
                 continue;
             }
         }
+
+        // Preform clipping
+
+        // Create a polygon from the original triangle to be clipped.
+        polygon_t polygon = create_polygon_from_triangle(
+            vec3_from_vec4(transformed_vertices[0]),
+            vec3_from_vec4(transformed_vertices[1]),
+            vec3_from_vec4(transformed_vertices[2])
+        );
+
+        // Clip the polygon and returns a new polygon with potential new vertices.
+        clip_polygon(&polygon);
+
+        printf("Number of polygon vertices after clipping: %d\n", polygon.num_vertices);
+
+        // After clipping, we need to break the polygon back into triangles.
 
         vec4_t projected_points[3];
 
