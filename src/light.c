@@ -1,8 +1,16 @@
 #include "light.h"
 
-light_t light = {
+static light_t light = {
     .direction = { 0, 0, 1 }
 };
+
+void init_light(vec3_t direction) {
+    light.direction = direction;
+}
+
+vec3_t get_light_direction(void) {
+    return light.direction;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Change color based on a percentage factor to represent light intensity
