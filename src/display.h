@@ -38,6 +38,7 @@ bool should_render_filled_triangles(void);
 bool should_render_textured_triangles(void);
 bool should_render_triangle_wireframe(void);
 bool should_render_wired_vertex(void);
+bool should_cull_backface(void);
 
 void draw_grid(void);
 void draw_pixel(int x, int y, uint32_t color);

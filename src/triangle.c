@@ -3,6 +3,28 @@
 #include "triangle.h"
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the normal vector of a triangle face
+///////////////////////////////////////////////////////////////////////////////
+vec3_t get_triangle_normal(vec4_t vertices[3]) {
+    // Get individual vectors from A, B, and C vertices to compute normal
+    vec3_t vector_a = vec3_from_vec4(vertices[0]); /*   A   */
+    vec3_t vector_b = vec3_from_vec4(vertices[1]); /*  / \  */
+    vec3_t vector_c = vec3_from_vec4(vertices[2]); /* C---B */
+
+    // Get the vector subtraction of B-A and C-A
+    vec3_t vector_ab = vec3_sub(vector_b, vector_a);
+    vec3_t vector_ac = vec3_sub(vector_c, vector_a);
+    vec3_normalize(&vector_ab);
+    vec3_normalize(&vector_ac);
+
+    // Compute the face normal (using cross product to find perpendicular)
+    vec3_t normal = vec3_cross(vector_ab, vector_ac);
+    vec3_normalize(&normal);
+
+    return normal;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the barycentric weights alpha, beta, and gamma for point p
 ///////////////////////////////////////////////////////////////////////////////
 //

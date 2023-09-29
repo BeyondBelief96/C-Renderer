@@ -66,6 +66,10 @@ bool should_render_wired_vertex(void) {
     return render_method == RENDER_WIRE_VERTEX;
 }
 
+bool should_cull_backface(void) {
+    return cull_method == CULL_BACKFACE;
+}
+
 float get_zbuffer_at(int x, int y) {
     if(x < 0 || x >= window_width || y < 0 || y >= window_height) {
         return 1.0;
