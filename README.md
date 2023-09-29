@@ -6,31 +6,10 @@ Currently the 3D renderer supports:
 - Rendering of multiple meshes/texture via .obj files and .png files.
 - Full software graphics pipeline
 - Flat shading lighting model
-///////////////////////////////////////////////////////////////////////////////
-// Process the graphics pipeline stages for all the mesh triangles
-///////////////////////////////////////////////////////////////////////////////
-// +-------------+
-// | Model space |  <-- original mesh vertices
-// +-------------+
-// |   +-------------+
-// -> | World space |  <-- multiply by world matrix
-//     +-------------+
-//     |   +--------------+
-//     -> | Camera space |  <-- multiply by view matrix
-//         +--------------+
-//         |    +------------+
-//         --> |  Clipping  |  <-- clip against the six frustum planes
-//              +------------+
-//              |    +------------+
-//              --> | Projection |  <-- multiply by projection matrix
-//                   +------------+
-//                   |    +-------------+
-//                   --> | Image space |  <-- apply perspective divide
-//                        +-------------+
-//                        |    +--------------+
-//                        --> | Screen space |  <-- ready to render
-//                             +--------------+
-///////////////////////////////////////////////////////////////////////////////
+- Fully movable camera using
+  - w/s for pitch
+  - up/down for forward and back
+  - left/right for yaw
 
 In order to compile you will need to install the linux build essentials and the SDL development libraries via your favorite package manager.
 If you're using apt run the following commands:
