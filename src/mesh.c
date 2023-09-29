@@ -97,4 +97,6 @@ void load_obj_file_data(char* filename) {
             array_push(mesh.faces, face);
         }
     }
+    array_free(texcoords);
+    fclose(file);
 }
