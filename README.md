@@ -16,8 +16,6 @@ If you're using apt run the following commands:
 - `sudo apt install build-essential`
 - `sudo apt install libsdl2-dev`
 
-- 
-
 ![image](https://github.com/BeyondBelief96/C-Renderer/assets/50305220/067ca2aa-2ee2-4f7b-92b8-de82e6fdeebc)
 
 
