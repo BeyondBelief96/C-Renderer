@@ -95,8 +95,8 @@ bool initialize_window(void) {
     //This values are used across the entire application and for initilizing
     //my color buffer and z buffer. If you divide these by the same value, you
     //preserve aspect ratio and achieve a retro effect.
-    window_width = fullscreen_width / 7;
-    window_height = fullscreen_height / 7;
+    window_width = fullscreen_width / 1;
+    window_height = fullscreen_height / 1;
 
     // Create a SDL Window
     window = SDL_CreateWindow(
